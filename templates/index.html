@@ -1,32 +1,54 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
-  <meta charset="UTF-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cloudtype - Flask</title>
-  <link href="https://cdn.jsdelivr.net/npm/daisyui@2.51.3/dist/full.css" rel="stylesheet" type="text/css" />
-  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2/dist/tailwind.min.css" rel="stylesheet" type="text/css" />
-  <link rel="shortcut icon" href="{{ url_for('static', filename='img/favicon.ico') }}">
+    <meta charset="UTF-8">
+    <title>거래 내역 조회</title>
+    <style>
+        table { border-collapse: collapse; width: 100%; }
+        th, td { border: 1px solid #888; padding: 6px 10px; text-align: center; }
+        th { background: #f0f0f0; }
+        .search-bar { margin-bottom: 18px; text-align: left; }
+        .search-bar label { margin-right: 8px; }
+        .search-bar input[type="date"] { padding: 4px 8px; margin-right: 12px; }
+        .search-bar button { padding: 4px 16px; }
+    </style>
 </head>
 <body>
-<div class="hero min-h-screen bg-base-200">
-  <div class="hero-content flex-col lg:flex-row-reverse">
-    <img src="{{ url_for('static', filename='img/flask.webp') }}" class="w-36 rounded-lg md:ml-5 lg:ml-5"  alt="flask"/>
-    <div>
-      <h1 class="text-5xl font-bold">Flask</h1>
-      <p class="py-6">클라우드타입에서 배포한 Flask 어플리케이션입니다.</p>
-      <button type="button" onclick="window.open('https://github.com/cloudtype-examples/java-springboot')" class="btn btn-outline rounded">
-        GitHub
-      </button>
-      <button type="button" onclick="window.open('https://docs.cloudtype.io/')" class="btn btn-outline rounded">
-        Docs
-      </button>
-      <button type="button" onclick="window.open('https://discord.gg/U7HX4BA6hu')" class="btn btn-outline rounded">
-        Discord
-      </button>
-    </div>
-  </div>
-</div>
+    <h2>거래 내역(trading_data)</h2>
+    <form class="search-bar" method="get" action="/tradelist">
+        <label for="start_date">조회시작일:</label>
+        <input type="date" id="start_date" name="start_date" value="{{ request.args.get('start_date', '') }}">
+        <label for="end_date">조회종료일:</label>
+        <input type="date" id="end_date" name="end_date" value="{{ request.args.get('end_date', '') }}">
+        <button type="submit">조회</button>
+    </form>
+    {% if rows and rows|length > 0 %}
+    <table>
+        <thead>
+            <tr>
+                {% for col in rows[0].keys() %}
+                <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for row in rows %}
+            <tr>
+                {% for col in row.keys() %}
+                <td>
+                  {% if col == 'execution_date' and row[col] %}
+                    {{ row[col][:10] }}
+                  {% else %}
+                    {{ row[col] }}
+                  {% endif %}
+                </td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p>데이터가 없습니다.</p>
+    {% endif %}
 </body>
-</html>
+</html> 
